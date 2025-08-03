@@ -11,13 +11,12 @@ namespace DeferredTasksAPIUnitTests.Services
     [TestClass]
     public class ScheduledTaskServiceUnitTests
     {
-        private ScheduledTaskService _sut;
-        private Mock<ILogger<ScheduledTaskService>> _mockLogger;
-        private Mock<IScheduledTasksRepository> _mockRepository;
-        private ScheduledTask _existingScheduledTask;
+        private readonly Mock<ILogger<ScheduledTaskService>> _mockLogger;
+        private readonly Mock<IScheduledTasksRepository> _mockRepository;
+        private readonly ScheduledTaskService _sut;
+        private readonly ScheduledTask _existingScheduledTask;
 
-        [TestInitialize]
-        public void InitializeTest()
+        public ScheduledTaskServiceUnitTests()
         {
             _mockLogger = new Mock<ILogger<ScheduledTaskService>>();
             _mockRepository = new Mock<IScheduledTasksRepository>();
@@ -30,7 +29,12 @@ namespace DeferredTasksAPIUnitTests.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
+            _sut = new ScheduledTaskService(_mockLogger.Object, _mockRepository.Object);
+        }
 
+        [TestInitialize]
+        public void InitializeTest()
+        {
             _ = _mockRepository
                 .Setup(m => m.Get(It.IsAny<Guid>(), It.IsAny<bool>()))
                 .Returns((Guid id, bool trackChanges) =>
@@ -60,8 +64,6 @@ namespace DeferredTasksAPIUnitTests.Services
                 {
                     return Task.FromResult(_mockRepository.Invocations.Count);
                 });
-
-            _sut = new ScheduledTaskService(_mockLogger.Object, _mockRepository.Object);
         }
 
         #region CreateScheduledTaskAsync
